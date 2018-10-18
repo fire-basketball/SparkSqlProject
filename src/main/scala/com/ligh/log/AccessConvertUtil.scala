@@ -1,5 +1,6 @@
 package com.ligh.log
 
+import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{LongType, StringType, StructField, StructType}
 
 /**
@@ -13,14 +14,14 @@ object AccessConvertUtil {
 
   val struct = StructType(
     Array(
-      StructField("url",StringType),
-      StructField("cmsType",StringType),
-      StructField("cmsId",LongType),
-      StructField("traffic",LongType),
-      StructField("ip",StringType),
-      StructField("city",StringType),
-      StructField("time",StringType),
-      StructField("day",StringType)
+      StructField("url",StringType,nullable = true),
+      StructField("cmsType",StringType,nullable = true),
+      StructField("cmsId",LongType,nullable = true),
+      StructField("traffic",LongType,nullable = true),
+      StructField("ip",StringType,nullable = true),
+      StructField("city",StringType,nullable = true),
+      StructField("time",StringType,nullable = true),
+      StructField("day",StringType,nullable = true)
     )
   )
 
@@ -28,14 +29,34 @@ object AccessConvertUtil {
     *  根据输入的每一行信息转换成输出的样式
     * @param log  输入的每一行记录信息
     */
-  def parseLog(log:String){
+  def parseLog(log:String)={
 
-    val splits = log.split("\t")
+    try{
+      val splits = log.split("\t")
 
-    val url = splits(1)
+      val url = splits(1)
+      val traffic = splits(2).toLong
+      val ip = splits(3)
 
-    val traffic = splits(2)
+      val domain = "http://blog.fens.me/"
+      val cms = url.substring(url.indexOf(domain) + domain.length)
+      val cmsTypeId = cms.split("/")
 
+      var cmsType = ""
+      var cmsId = 0l
+      if(cmsTypeId.length > 1) {
+        cmsType = cmsTypeId(0)
+        cmsId = cmsTypeId(1).toLong
+      }
 
+      val city = ""
+      val time = splits(0)
+      val day = time.substring(0,10).replaceAll("-","")
+
+      //这个row里面的字段要和struct中的字段对应上
+      Row(url, cmsType, cmsId, traffic, ip, city, time, day)
+    }catch {
+      case e:Exception => Row("","",0l,0l,"","","","")
+    }
   }
 }

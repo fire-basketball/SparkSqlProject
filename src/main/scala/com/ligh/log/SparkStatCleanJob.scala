@@ -11,12 +11,33 @@ object SparkStatCleanJob {
 
     val spark = SparkSession.builder().appName("SparkStatCleanJob").master("local[2]").getOrCreate()
 
-    val accessRDD = spark.sparkContext.textFile("file:///Users/fish/Desktop/output/access.log")
-    accessRDD.take(100).foreach(println)
+    val accessRDD = spark.sparkContext.textFile("/Users/fish/Desktop/output/access.log")
+ //   accessRDD.take(100).foreach(println)
 
 
+    /**
+      * StructType(header_clean.split(",").map(fieldName ⇒StructField(fieldName, StringType, true)))
+        var contentRdd = contentNoHeader.map(k => k.split(",")).map(
+        p => {
+         val ppp = p.map( x => x.replace("\"", "").trim)
+       Row(ppp(0),ppp(1),ppp(2))
+      })
+      */
 
-    spark.stop()
+
+    val accessDF = spark.createDataFrame(accessRDD.map(x => AccessConvertUtil.parseLog(x)),
+
+      AccessConvertUtil.struct)
+
+    accessDF.show(20)
+
+    accessDF.printSchema()
+    accessDF.show()
+
+    accessDF.show(false)
+
+    spark.stop
 
   }
+
 }
