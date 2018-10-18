@@ -29,10 +29,8 @@ object SparkStatCleanJob {
 
       AccessConvertUtil.struct)
 
-    accessDF.show(20)
-
     accessDF.printSchema()
-    accessDF.show()
+    accessDF.filter(accessDF.col("url") isNotNull).show(100)
 
     accessDF.show(false)
 

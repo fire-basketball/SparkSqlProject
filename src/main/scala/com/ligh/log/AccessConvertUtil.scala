@@ -16,8 +16,8 @@ object AccessConvertUtil {
     Array(
       StructField("url",StringType,nullable = true),
       StructField("cmsType",StringType,nullable = true),
-      StructField("cmsId",LongType,nullable = true),
-      StructField("traffic",LongType,nullable = true),
+      StructField("cmsId",StringType,nullable = true),
+      StructField("traffic",StringType,nullable = true),
       StructField("ip",StringType,nullable = true),
       StructField("city",StringType,nullable = true),
       StructField("time",StringType,nullable = true),
@@ -35,7 +35,7 @@ object AccessConvertUtil {
       val splits = log.split("\t")
 
       val url = splits(1)
-      val traffic = splits(2).toLong
+      val traffic = splits(2)
       val ip = splits(3)
 
       val domain = "http://blog.fens.me/"
@@ -43,10 +43,10 @@ object AccessConvertUtil {
       val cmsTypeId = cms.split("/")
 
       var cmsType = ""
-      var cmsId = 0l
+      var cmsId = ""
       if(cmsTypeId.length > 1) {
         cmsType = cmsTypeId(0)
-        cmsId = cmsTypeId(1).toLong
+        cmsId = cmsTypeId(1)
       }
 
       val city = ""
@@ -56,7 +56,7 @@ object AccessConvertUtil {
       //这个row里面的字段要和struct中的字段对应上
       Row(url, cmsType, cmsId, traffic, ip, city, time, day)
     }catch {
-      case e:Exception => Row("","",0l,0l,"","","","")
+      case e:Exception => Row("","","","","","","","")
     }
   }
 }
