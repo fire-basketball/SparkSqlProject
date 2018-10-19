@@ -1,6 +1,7 @@
 package com.ligh.log
 
-import org.apache.spark.sql.SparkSession
+import com.ligh.util.AccessConvertUtil
+import org.apache.spark.sql.{SaveMode, SparkSession}
 
 /**
   *  使用spark完成数据的清洗操作
@@ -30,10 +31,12 @@ object SparkStatCleanJob {
       AccessConvertUtil.struct)
 
     accessDF.printSchema()
-    accessDF.filter(accessDF.col("url") isNotNull).show(100)
-
-    accessDF.show(false)
-
+  //  accessDF.filter(accessDF.col("url") isNotNull).show(100)
+//    accessDF.show(100)
+  // coalesce 是做优化操作，把生成的文件放在一个文件中（就是合并文件）  mode方法是为了文件目录存在时不会报文件已存在的错误
+    accessDF.coalesce(1).write.format("parquet").mode(SaveMode.Overwrite).partitionBy("day")
+      .save("/Users/fish/Desktop/output/clean")
+    //生成的就是parquet类型的文件，也就是做统计的源文件
     spark.stop
 
   }
