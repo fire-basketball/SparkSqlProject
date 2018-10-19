@@ -16,7 +16,7 @@ object MysqlUtils {
     */
   def getConnection() = {
 
-    DriverManager.getConnection("jdbc:mysql://47.100.176.47:3306/imooc_project?user=root&password=123456")
+    DriverManager.getConnection("jdbc:mysql://ip:3306/imooc_project?user=root&password=123456")
   }
 
   /**
