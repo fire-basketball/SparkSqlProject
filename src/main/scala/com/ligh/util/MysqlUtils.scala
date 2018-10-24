@@ -1,8 +1,7 @@
 package com.ligh.util
 
-import java.sql.{DriverManager, PreparedStatement}
+import java.sql.{Connection, DriverManager, PreparedStatement}
 
-import com.mysql.jdbc.Connection
 
 /**
   *  Mysql操作工具类
@@ -16,7 +15,7 @@ object MysqlUtils {
     */
   def getConnection() = {
 
-    DriverManager.getConnection("jdbc:mysql://ip:3306/imooc_project?user=root&password=123456")
+    DriverManager.getConnection("jdbc:mysql://47.100.176.47:3306/imooc_project?user=root&password=123456")
   }
 
   /**

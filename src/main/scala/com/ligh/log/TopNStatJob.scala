@@ -1,7 +1,10 @@
 package com.ligh.log
 
+import com.ligh.dao.StatDAO
+import com.ligh.entity.DayVideoAccessStat
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.functions._
+
+import scala.collection.mutable.ListBuffer
 
 /**
   * TopN统计Spark作业
@@ -21,8 +24,8 @@ object TopNStatJob {
 
     val accsessDF = spark.read.format("parquet").load("/Users/fish/Desktop/output/clean")
 
-    accsessDF.printSchema()
-    accsessDF.show(false)
+//    accsessDF.printSchema()
+//    accsessDF.show(false)
 
     videoAccessTopNStat(spark,accsessDF)
 
@@ -45,8 +48,27 @@ object TopNStatJob {
     accessDF.createOrReplaceTempView("access_logs")
     val videoAccessTopNDF =  spark.sql("select day,cmsId,count(1) as times from access_logs where day='20130919' and cmsType='js' group by day,cmsId order by times desc")
 
+//   videoAccessTopNDF.show(1000)
+    /**
+      *  将统计结果放在数据库中
+      */
+    try{
+        videoAccessTopNDF.foreachPartition(partitionOfRecode =>{
+        var list = new ListBuffer[DayVideoAccessStat]
 
-    videoAccessTopNDF.show(false)
+        partitionOfRecode.foreach(info => {
+          val day = info.getAs[String]("day")
+          val cmsId = info.getAs[String]("cmsId")
+          val times = info.getAs[Long]("times")
+          list.append(DayVideoAccessStat(day,cmsId,times))
+        })
+        StatDAO.insertDayVideoAccessTopN(list)
+
+      })
+    }catch {
+      case e:Exception => e.printStackTrace()
+    }
+
   }
 
 }
