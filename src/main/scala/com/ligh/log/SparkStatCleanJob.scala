@@ -16,7 +16,7 @@ object SparkStatCleanJob {
  //   accessRDD.take(100).foreach(println)
 
 
-    /**
+     /**
       * StructType(header_clean.split(",").map(fieldName ⇒StructField(fieldName, StringType, true)))
         var contentRdd = contentNoHeader.map(k => k.split(",")).map(
         p => {
